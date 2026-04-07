@@ -1,0 +1,32 @@
+# --- Personal & Project Specific ---
+activation steps.txt
+rewamp.txt
+config.json
+export_*.md
+
+# --- Python Environment & Cache ---
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+
+# --- Local Data ---
+*.db
+context_history.db
+
+# --- Development Tools ---
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.env
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
