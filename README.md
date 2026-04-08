@@ -33,6 +33,16 @@ pip install -e .
 ```
 
 ## 📖 Usage
+
+### 🖥️ Desktop Dashboard (GUI)
+Best for keeping a dedicated, high-visibility monitoring window open beside your IDE.
+```bash
+python app.py
+# OR
+gemini-context-gui
+```
+
+### 📟 Terminal Version (TUI)
 Run without arguments to see the **latest session**:
 ```bash
 python gemini_context.py

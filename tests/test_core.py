@@ -5,6 +5,7 @@ from core.calculator import calc_session_context, calc_avg_tokens_per_turn, CONT
 def test_session_data_validation():
     # Valid data
     data = {
+        "sessionId": "test1",
         "messages": [
             {
                 "model": "gemini-1.5-pro",
@@ -23,6 +24,7 @@ def test_session_data_validation():
 
 def test_calc_session_context():
     session = SessionData(
+        sessionId="test2",
         messages=[
             Message(
                 model="gemini-1.5-pro",
@@ -39,6 +41,7 @@ def test_calc_session_context():
 
 def test_calc_avg_tokens_per_turn():
     session = SessionData(
+        sessionId="test3",
         messages=[
             Message(usageMetadata=UsageMetadata(promptTokenCount=1000)),
             Message(usageMetadata=UsageMetadata(promptTokenCount=2000)),

@@ -7,6 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "rich>=13.0.0",
     "pydantic>=2.0.0",
+    "customtkinter>=5.2.0",
 ]
 
 [dependency-groups]
@@ -18,3 +19,4 @@ dev = [
 
 [project.scripts]
 gemini-context = "gemini_context:main"
+gemini-context-gui = "app:main"

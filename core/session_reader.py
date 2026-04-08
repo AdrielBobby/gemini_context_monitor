@@ -93,6 +93,62 @@ def get_session_dir(config_path="config.json"):
 
     return None
 
+def get_display_name(filepath: str) -> str:
+    """Extracts a readable title from the session content or filename fallback."""
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            # Find first user prompt
+            messages = data.get("messages", [])
+            for m in messages:
+                # Some formats use "role": "user", others use "type": "user"
+                role = m.get("role") or m.get("type")
+                if role == "user":
+                    # Extract text from complex parts or simple string
+                    content = m.get("content") or ""
+                    text = ""
+                    if isinstance(content, str):
+                        text = content
+                    elif isinstance(content, list):
+                        text = " ".join([p.get("text", "") for p in content if isinstance(p, dict) and p.get("text")])
+                    
+                    if text:
+                        # Clean: strip newlines, special chars, extra spaces
+                        clean = re.sub(r'[\r\n\t]+', ' ', text)
+                        clean = re.sub(r'[^\w\s\?\!]', '', clean)
+                        words = clean.strip().split()
+                        
+                        # Skip common starters for better "meaningful" title
+                        starters = ["aight", "gang", "so", "okay", "can", "you", "help", "me", "i", "we", "were"]
+                        start_idx = 0
+                        while start_idx < len(words) and words[start_idx].lower() in starters:
+                            start_idx += 1
+                        
+                        title_words = words[start_idx : start_idx + 7]
+                        if not title_words: # Fallback if everything was a starter
+                            title_words = words[:7]
+                            
+                        title = " ".join(title_words)
+                        if title:
+                            # Capitalize first letter of result
+                            return title[0].upper() + title[1:]
+    except Exception:
+        pass
+
+    # Fallback to timestamp from filename: session-YYYY-MM-DDTHH-mm-HASH.json
+    filename = os.path.basename(filepath)
+    match = re.search(r'(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})', filename)
+    if match:
+        year, month, day, hour, minute = match.groups()
+        from datetime import datetime
+        try:
+            dt = datetime(int(year), int(month), int(day), int(hour), int(minute))
+            return dt.strftime("%b %d, %I:%M %p")
+        except:
+            pass
+            
+    return filename # Absolute fallback
+
 def list_sessions(session_dir):
     """Returns a list of session files with metadata."""
     files = glob.glob(os.path.join(session_dir, "*.json"))
@@ -100,7 +156,8 @@ def list_sessions(session_dir):
     for f in files:
         stats = os.stat(f)
         sessions.append({
-            "name": os.path.basename(f),
+            "name": get_display_name(f),
+            "filename": os.path.basename(f),
             "path": f,
             "mtime": stats.st_mtime,
             "size": stats.st_size
