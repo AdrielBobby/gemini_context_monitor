@@ -3,7 +3,14 @@ import json
 import glob
 from core.session_reader import SessionData
 
-CONTEXT_LIMIT = 1048576
+MODEL_LIMITS = {
+    "gemini-3-flash-preview": 1048576,
+    "gemini-3.1-pro-preview": 1048576,
+    "gemini-1.5-pro": 2097152,
+    "gemini-1.5-flash": 1048576,
+}
+
+DEFAULT_CONTEXT_LIMIT = 1048576
 
 def calc_session_context(data: SessionData):
     """Calculates context usage for a single session data object."""
@@ -41,8 +48,12 @@ def calc_session_context(data: SessionData):
     
     # In LLMs, current 'used' context is the size of the latest prompt (input)
     used = input_tokens
-    remaining = CONTEXT_LIMIT - used
-    percent_used = (used / CONTEXT_LIMIT) * 100
+    
+    # Get limit from lookup or default
+    limit = MODEL_LIMITS.get(model, DEFAULT_CONTEXT_LIMIT)
+    
+    remaining = limit - used
+    percent_used = (used / limit) * 100
 
     return {
         "input": input_tokens,
@@ -51,6 +62,7 @@ def calc_session_context(data: SessionData):
         "used": used,
         "remaining": remaining,
         "percent_used": percent_used,
+        "limit": limit,
         "model": model,
         "turns": len(messages)
     }
